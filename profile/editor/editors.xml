@@ -1,0 +1,23 @@
+<editors>
+ <!-- ST -->
+  <editor id="bool">              <range uom="2"  subset="0,1" /> </editor>
+
+ <!-- GV0 -->
+  <editor id="DEBUG_LEVEL_RANGE"> <range uom="25" subset="10,20,30" nls="EN_I_DEBUG_LEVEL" /> </editor>
+
+ <!-- GV1 -->
+  <editor id="carstate">          <range uom="25" subset="0,1" nls="EN_I_CAR_STATE" /> </editor>
+
+ <!-- GV2 & GV5 -->
+  <editor id="SoC">               <range uom="51" subset="0-100"/> </editor>
+
+ <!-- GV3, GV5, & GV6 -->
+  <editor id="range">             <range uom="116" /> </editor>
+
+ <!-- GV4 -->
+  <editor id="chargeLevel">       <range uom="51" subset="50-100" /> </editor>
+
+ <!-- GV7 -->
+  <editor id="doorlocks">        <range uom="25" subset="0,1" nls="EN_I_LOCKS_STATE"/> </editor>
+
+</editors>

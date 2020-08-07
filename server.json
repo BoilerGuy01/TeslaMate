@@ -1,0 +1,24 @@
+{
+    "name": "TeslaMate",
+    "docs": "https://github.com/BoilerGuy01/TeslaMate",
+    "type": "python3",
+    "executable": "teslamate-poly.py",
+    "install": "install.sh",
+    "install_cloud": "install_cloud.sh",
+    "description": "TeslaMate Node Server",
+    "notice": "Use as is",
+    "shortPoll": "30",
+    "longPoll": "240",
+    "testMode": false,
+    "profile_version": "1.0.0",
+    "credits": [
+        {
+            "title": "A NodeServer for using the TeslaMate MQTT",
+            "author": "PurdueGuy",
+            "version": "1.0.0",
+            "date": "June 6, 2020",
+            "source": "https://github.com/BoilerGuy01/TeslaMate",
+            "license": "https://raw.githubusercontent.com/BoilerGuy01/TeslaMate/master/LICENSE"
+        }
+    ]
+}

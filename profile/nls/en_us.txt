@@ -1,0 +1,35 @@
+# controller
+ND-controller-NAME = TeslaMate NodeServer Controller
+CMD-ctl-QUERY"-NAME = Query
+CMD-ctl-DISCOVER-NAME = Re-Discover
+CMD-ctl-UPDATE_PROFILE-NAME = Update Profile
+CMD-ctl-REMOVE_NOTICES_ALL-NAME = Remove All Notices
+CMD-ctl-REMOVE_NOTICE_TEST-NAME = Remove Notice Test
+CMD-SET_DEBUG_LEVEL-NAME = Set Debug Level
+ST-ctl-ST-NAME = NodeServer Online
+
+ND-vehicle-NAME = TeslaMate Vehicle
+ST-vehicle-ST-NAME = Vehicle Node Online
+ST-vehicle-GV0-NAME = Debug Level
+ST-vehicle-GV1-NAME = Vehicle State
+ST-vehicle-GV2-NAME = State-of-Charge (SoC)
+ST-vehicle-GV3-NAME = Est. Range
+ST-vehicle-GV4-NAME = Charge Limit
+ST-vehicle-GV5-NAME = Rated Range
+ST-vehicle-GV6-NAME = Odometer
+ST-vehicle-GV7-NAME = Door Lock Status
+
+# Car State
+EN_I_CAR_STATE-0 = Sleeping
+EN_I_CAR_STATE-1 = Idling
+EN_I_CAR_STATE-2 = Driving
+EN_I_CAR_STATE-3 = Charging
+
+# Debug level
+EN_I_DEBUG_LEVEL-10 = Debug
+EN_I_DEBUG_LEVEL-20 = Info
+EN_I_DEBUG_LEVEL-30 = Warning
+
+# Door Locks State
+EN_I_LOCKS_STATE-0 = Unlocked
+EN_I_LOCKS_STATE-1 = Locked

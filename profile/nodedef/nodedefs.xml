@@ -1,0 +1,45 @@
+<nodeDefs>
+    <!-- NODE DEF from 5.0 document http://wiki.universal-devices.com/index.php?title=V50_MAIN -->
+    <!-- controller, this must mach the id in your Controller class-->
+    <nodeDef id="controller" nls="ctl">
+        <editors />
+        <sts>
+	    <st id="ST" editor="bool" />
+	</sts>
+        <cmds>
+            <sends>
+              <cmd id="DON" />
+              <cmd id="DOF" />
+            </sends>
+            <accepts>
+              <cmd id="QUERY" />
+              <cmd id="DISCOVER" />
+              <cmd id="UPDATE_PROFILE" />
+              <cmd id="SET_DEBUG_LEVEL">
+                <p id="" editor="DEBUG_LEVEL_RANGE" init="GV0" optional="F"/>
+              </cmd>
+            </accepts>
+        </cmds>
+    </nodeDef>
+    <nodeDef id="vehicle" nls="vehicle">
+        <editors />
+        <sts>
+            <st id="ST" editor="bool" />
+            <st id="GV1" editor="carstate" />
+            <st id="GV2" editor="SoC" />
+            <st id="GV3" editor="range" />
+            <st id="GV4" editor="chargeLevel" hide="T"/>
+            <st id="GV5" editor="range"/>
+            <st id="GV6" editor="range"/>
+            <st id="GV7" editor="doorlocks"/>
+        </sts>
+        <cmds>
+            <sends>
+              <cmd id="DON" />
+              <cmd id="DOF" />
+            </sends>
+            <accepts>
+            </accepts>
+        </cmds>
+    </nodeDef>
+</nodeDefs>
