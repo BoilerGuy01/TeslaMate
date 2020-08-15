@@ -28,7 +28,7 @@
             <st id="GV1" editor="carstate" />
             <st id="GV2" editor="SoC" />
             <st id="GV3" editor="range" />
-            <st id="GV4" editor="chargeLevel" hide="T"/>
+            <st id="GV4" editor="chargeLevel"/>
             <st id="GV5" editor="range"/>
             <st id="GV6" editor="range"/>
             <st id="GV7" editor="doorlocks"/>
