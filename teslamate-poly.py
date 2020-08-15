@@ -21,10 +21,12 @@ MILES_PER_KM=0.621371
 class Controller(polyinterface.Controller):
     def controller_on_connect(self, client, userdata, flags, rc):
       LOGGER.debug('Connected with result code '.format(str(rc)))
-      client.subscribe("teslamate/cars/+/display_name")
+      client.subscribe("teslamate/cars/#")
 
     def controller_on_message(self, client, userdata, msg):
+      LOGGER.debug('')
       LOGGER.debug('MQTT message {}:{}'.format(msg.topic, msg.payload))
+      LOGGER.debug('controller_on_message self = {}'.format(self))
       topic = msg.topic.split('/')
       vehicleNumber = topic[2]
       statusItem = topic[3]
@@ -35,8 +37,17 @@ class Controller(polyinterface.Controller):
       nodeAddress = str(vehicleNumber)
       if bool(self.nodes.get(nodeAddress)): 
         LOGGER.debug('Vehicle was found in list')
+
+        # pass the message to the node for handling
+        targetVehicle = self.nodes.get(nodeAddress)
+        LOGGER.debug('controller_on_message targetVehicle = {}'.format(targetVehicle))
+        LOGGER.debug('Handing message off to vehicle node')
+        targetVehicle.handleMessage(statusItem, payload)
+        LOGGER.debug('Handed  message off to vehicle node')
+
       else:
         LOGGER.debug('Vehicle was NOT found in list')
+        LOGGER.debug('nodes = {}'.format(self.nodes))
         # not found, so if this is the display_name variable, add the node
         if statusItem == 'display_name':
           LOGGER.info('Adding ndoe with address {} and name {}'.format(nodeAddress, payload))
@@ -46,25 +57,27 @@ class Controller(polyinterface.Controller):
 
     def __init__(self, polyglot):
         super(Controller, self).__init__(polyglot)
+        LOGGER.debug('Controller __init__')
         self.name = 'TeslaMate Controller'
         self.poly.onConfig(self.process_config)
         self.client = mqtt.Client()
         self.client.on_connect = self.controller_on_connect
         self.client.on_message = self.controller_on_message
-        LOGGER.debug('Done with __init__')
+        LOGGER.debug('Controller done with __init__')
 
     def start(self):
         # This grabs the server.json data and checks profile_version is up to date
         serverdata = self.poly.get_server_data()
         LOGGER.info('Started TeslaMate NodeServer {}'.format(serverdata['version']))
+        LOGGER.info("self.polyConfig[customParams].items() = %s" ,self.polyConfig['customParams'].items())
         self.heartbeat(0)
         self.check_params()
-        #self.discover()
         self.poly.add_custom_config_docs("")
         self.poly.installprofile()
+        self.discover()
 
     def shortPoll(self):
-        LOGGER.debug('shortPoll - done checking TeslaMate')
+        LOGGER.debug('shortPoll')
 
     def longPoll(self):
         LOGGER.debug('longPoll')
@@ -78,12 +91,9 @@ class Controller(polyinterface.Controller):
     def discover(self, *args, **kwargs):
         LOGGER.debug('Controller - discover')
         self.client.connect(self.MQTT_HOST, 1883, 60)
+
+        # start MQTT background loop
         self.client.loop_start()
-        # give it 10 seconds to get all the vehicles
-        LOGGER.debug("Discover - sleeping for 10 seconds for discovery")
-        time.sleep(10)
-        LOGGER.debug("Discover - slept for 10 seconds for discovery - stopping discovery")
-        self.client.loop_stop()
         return
           
     def delete(self):
@@ -209,26 +219,18 @@ class VehicleNode(polyinterface.Node):
   def __init__(self, controller, primary, address, name, mqttHost, vehicleNumber):
     super(VehicleNode, self).__init__(controller, primary, address, name)
     self.vehicleNumber = vehicleNumber
-    self.MQTT_HOST = mqttHost
-    self.client = mqtt.Client()
-    self.client.on_connect = self.vehicle_on_connect
-    self.client.on_message = self.vehicle_on_message
 
-  def vehicle_on_connect(self, client, userdata, flags, rc):
-      LOGGER.debug('Vehicle {} connected with result code '.format(self.vehicleNumber, str(rc)))
-      subscribeTopic = "teslamate/cars/" + self.vehicleNumber + "/#"
-      LOGGER.debug("Vehicle # {} subscribing to topic {}".format(self.vehicleNumber, subscribeTopic))
-      client.subscribe(subscribeTopic)
-
-  def vehicle_on_message(self, client, userdata, msg):
-      LOGGER.debug('Vehicle MQTT message {}:{}'.format(msg.topic, msg.payload))
-      topic = msg.topic.split('/')
-      vehicleNumber = topic[2]
-      statusItem = topic[3]
-      payload = msg.payload.decode('utf-8')
+  def handleMessage(self, statusItem, payload):
+      LOGGER.debug('Vehicle MQTT message {}:{}'.format(statusItem, payload))
+      LOGGER.debug('handleMessage self = {}'.format(self))
+      LOGGER.debug('Calling self.setOn()')
+      self.setOn(payload)
+      LOGGER.debug('Called  self.setOn()')
+      self.setDriver('ST', 1)
 
       d = {"state"                  : self.vehicle_state,
            "odometer"               : self.vehicle_odometer,
+           "charge_limit_soc"       : self.vehicle_charge_limit_soc,
            "locked"                 : self.vehicle_locked,
            "est_battery_range_km"   : self.vehicle_est_battery_range_km,
            "rated_battery_range_km" : self.vehicle_rated_battery_range_km,
@@ -239,10 +241,6 @@ class VehicleNode(polyinterface.Node):
         LOGGER.debug("Status item '{}' unimplemented".format(statusItem))
 
   def start(self):
-    LOGGER.debug('Vehicle start - calling mqtt connect')
-    self.client.connect(self.MQTT_HOST, 1883, 60)
-    self.client.loop_start()
-    LOGGER.debug('Vehicle start - called  mqtt connect')
     pass
 
   def shortPoll(self):
@@ -252,9 +250,11 @@ class VehicleNode(polyinterface.Node):
     LOGGER.debug('VehicleNode - longPoll')
 
   def setOn(self, command):
+    LOGGER.debug("Vehicle setOn")
     self.setDriver('ST', 1)
 
   def setOff(self, command):
+    LOGGER.debug("Vehicle setOff")
     self.setDriver('ST', 0)
 
   def query(self,command=None):
@@ -283,12 +283,16 @@ class VehicleNode(polyinterface.Node):
   def vehicle_usable_battery_level(self, payload):
     self.setDriver('GV2', payload)
 
+  def vehicle_charge_limit_soc(self, payload):
+    self.setDriver('GV4', payload)
+
   def vehicle_state(self, payload):
     LOGGER.debug('vehicleNumber {} - state: {}'.format(self.vehicleNumber, payload))
     sleepState = {'asleep': 0,
                   'idle'  : 1,
                   'driving': 2,
-                  'charging' : 3}
+                  'charging' : 3,
+                  'suspended': 4}
     LOGGER.debug("Setting vehicle_state to {}".format(sleepState[payload]))
     self.setDriver('GV1', sleepState[payload])
     LOGGER.debug("Set     vehicle_state to {}".format(sleepState[payload]))
