@@ -32,6 +32,7 @@
             <st id="GV5" editor="range"/>
             <st id="GV6" editor="range"/>
             <st id="GV7" editor="doorlocks"/>
+            <st id="GV8" editor="temp"/>
         </sts>
         <cmds>
             <sends>
